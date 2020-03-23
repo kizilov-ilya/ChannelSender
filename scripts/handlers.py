@@ -1,6 +1,7 @@
 from bot import bot, dp, types
 from scripts.config import ADMIN_ID
 from scripts import messages
+from aiogram.utils.emoji import emojize
 import requests
 
 
