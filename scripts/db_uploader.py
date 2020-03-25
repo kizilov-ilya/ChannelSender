@@ -1,3 +1,5 @@
+#IMPORTANT: IT IS STILL USEFUL BUT MEANWHILE IT BEEN REWRITE!!!
+
 import os
 import asyncio
 import logging
