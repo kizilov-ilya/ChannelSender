@@ -7,7 +7,7 @@ from aiogram import Bot
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from scripts.db_manager import Base, MediaIds
+from scripts.db_manager import Base, MediaIds #no longer works
 from scripts.config import BOT_TOKEN, ADMIN_ID, DB_FILENAME
 
 logging.basicConfig(format=u'%(filename)s [ LINE:%(lineno)+3s ]#%(levelname)+8s [%(asctime)s]  %(message)s',
