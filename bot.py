@@ -18,6 +18,10 @@ async def send_message(message: types.Message, *args):
     await bot.send_message(chat_id=ADMIN_ID, text=messages.text)
 
 
+async def asleep_message(*args):
+    await bot.send_message(chat_id=ADMIN_ID, text=messages.asleep)
+
+
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
     await message.reply("<b>Привет!</b>\nНапиши мне что-нибудь!")
@@ -41,4 +45,5 @@ async def process_clear(*args):
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp, on_startup=send_message)
+    executor.start_polling(dp, on_startup=send_message, on_shutdown=send_message)
+

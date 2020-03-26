@@ -1,71 +1,42 @@
-#IMPORTANT: IT IS STILL USEFUL BUT MEANWHILE IT BEEN REWRITE!!!
-
-import os
-import asyncio
+import mysql.connector
 import logging
-from aiogram import Bot
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-
-from scripts.db_manager import Base, MediaIds #no longer works
-from scripts.config import BOT_TOKEN, ADMIN_ID, DB_FILENAME
+from mysql.connector import Error
+from scripts.config import DB_NAME, DB_PASSWORD, DB_USER, DB_HOST
 
 logging.basicConfig(format=u'%(filename)s [ LINE:%(lineno)+3s ]#%(levelname)+8s [%(asctime)s]  %(message)s',
                     level=logging.DEBUG)
-
-engine = create_engine(f'sqlite:///{DB_FILENAME}')
-
-if not os.path.isfile(f'./{DB_FILENAME}'):
-    Base.metadata.create_all(engine)
-
-session_factory = sessionmaker(bind=engine)
-Session = scoped_session(session_factory)
-
-bot = Bot(token=BOT_TOKEN)
-
-BASE_MEDIA_PATH = './demo-media'
+BASE_MEDIA_PATH = "C:\\Users\\Public\\Pictures\\Sample Pictures\\1.jpg"
 
 
-async def uploadMediaFiles(folder, method, file_attr):
-    folder_path = os.path.join(BASE_MEDIA_PATH, folder)
-    for filename in os.listdir(folder_path):
-        if filename.startswith('.'):
-            continue
+# using print until demo
 
-        logging.info(f'Started processing {filename}')
-        with open(os.path.join(folder_path, filename), 'rb') as file:
-            msg = await method(ADMIN_ID, file, disable_notification=True)
-            if file_attr == 'photo':
-                file_id = msg.photo[-1].file_id
-            else:
-                file_id = getattr(msg, file_attr).file_id
-            session = Session()
-            newItem = MediaIds(file_id=file_id, filename=filename)
-            try:
-                session.add(newItem)
-                session.commit()
-            except Exception as e:
-                logging.error(
-                    'Couldn\'t upload {}. Error is {}'.format(filename, e))
-            else:
-                logging.info(
-                    f'Successfully uploaded and saved to DB file {filename} with id {file_id}')
-            finally:
-                session.close()
+def convert_to_binary_data(filename):
+    with open(filename, "rb") as file:
+        binaryDATA = file.read()
+    return binaryDATA
 
 
-loop = asyncio.get_event_loop()
+def insertBLOB(picture):
+    print("Inserting BLOB file into picture_post table!")
+    try:
+        connection = mysql.connector.connect(host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD)
+        cursor = connection.cursor()
+        sql_insert_blob_query = "INSERT INTO picture_post(picture) VALUES (%s);"
+        post_picture = convert_to_binary_data(picture)
+        insert_blob_tuple = (post_picture)
+        result = cursor.execute(sql_insert_blob_query, insert_blob_tuple)
+        connection.commit()
+        print("Image inserted succesfully as a BLOB file", result)
 
-tasks = [
-    loop.create_task(uploadMediaFiles('pics', bot.send_photo, 'photo')),
-    loop.create_task(uploadMediaFiles('videos', bot.send_video, 'video')),
-    loop.create_task(uploadMediaFiles('videoNotes', bot.send_video_note, 'video_note')),
-    loop.create_task(uploadMediaFiles('files', bot.send_document, 'document')),
-    loop.create_task(uploadMediaFiles('ogg', bot.send_voice, 'voice')),
-]
+    except mysql.connector.Error as error:
+        print(f"Failed inserting BLOB data into MySQL table {error}")
 
-wait_tasks = asyncio.wait(tasks)
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+            print("MySQL connection is closed!")
 
-loop.run_until_complete(wait_tasks)
-loop.close()
-Session.remove()
+
+insertBLOB(BASE_MEDIA_PATH)
+#IS NOT WORK FIX LATER
