@@ -17,7 +17,7 @@ def insertBLOB(picture):
         connection = connect(host=DB_HOST, user=DB_USER, db=DB_NAME, password=DB_PASSWORD)
         cursor = connection.cursor()
         post_picture = convert_to_binary_data(picture)
-        result = cursor.execute("insert into picture_post values(%s,%s,%s,%s)", ('7', '0', '0', post_picture))
+        result = cursor.execute("insert into picture_post(picture) values(%s)", (post_picture))
         connection.commit()
         print("Image inserted succesfully as a BLOB file", result)
 
@@ -25,7 +25,7 @@ def insertBLOB(picture):
         print(f"Failed inserting BLOB data into MySQL table {error}")
 
     finally:
-        if (connection.open()):
+        if (cursor.connection):
             cursor.close()
             connection.close()
             print("MySQL connection is closed!")

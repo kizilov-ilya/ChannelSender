@@ -23,7 +23,7 @@ class ChannelManager:
 
     @staticmethod
     def clean():
-        query = 'delete from clean_test'
+        query = 'delete from picture_post'
         con, cur = create_sync_con()
         cur.execute(query=query)
         con.commit()
