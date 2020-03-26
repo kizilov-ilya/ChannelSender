@@ -28,3 +28,10 @@ class ChannelManager:
         cur.execute(query=query)
         con.commit()
         con.close
+
+    @staticmethod
+    async def add_user(tel_id, username, lang, loop):
+        con, cur = await create_con(loop)
+        await cur.execute('insert into clean_test values(%s, %s)', (tel_id, username, lang, '0', True, '0'))
+        await con.commit()
+        con.close()

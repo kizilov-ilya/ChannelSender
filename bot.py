@@ -43,6 +43,9 @@ async def process_help(*args):
 async def process_clear(*args):
     await ChannelManager.clean()
 
+@dp.message_handler()
+async def process_insert(*args):
+    pass
 
 if __name__ == '__main__':
     executor.start_polling(dp, on_startup=send_message, on_shutdown=send_message)
