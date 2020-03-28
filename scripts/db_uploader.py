@@ -25,7 +25,7 @@ def insertBLOB(picture):
         post_picture = convert_to_binary_data(picture)
         insert_blob_tuple = (post_picture)
 
-        result = cursor.execute("insert into picture_post values(%s,%s,%s,%s)", ('6', '0', '0', post_picture))
+        result = cursor.execute("insert into picture_post(picture) values(%s)", (post_picture))
         connection.commit()
         print("Image inserted succesfully as a BLOB file", result)
 
