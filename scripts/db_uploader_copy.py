@@ -45,4 +45,4 @@ def insertBLOB(folder):
             print("MySQL connection is closed!")
 
 
-insertBLOB('pics')
+insertBLOB('files')
