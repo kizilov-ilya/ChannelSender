@@ -5,4 +5,4 @@ MAIN_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 DB_NAME = "sender_db"
 DB_USER = "root"
 DB_HOST = "localhost"
-DB_PASSWORD = "Dbrbyu2112cegth"  # actually not necessary right now
+DB_PASSWORD = "**********"  # actually not necessary right now
