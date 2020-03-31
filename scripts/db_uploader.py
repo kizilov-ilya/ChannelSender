@@ -1,43 +1,48 @@
-import mysql.connector
+import os
 import logging
-from mysql.connector import Error
-from scripts.config import DB_NAME, DB_PASSWORD, DB_USER, DB_HOST
+from tqdm import tqdm
+from pymysql import connect
+from pymysql import Error
+from scripts.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USER
 
 logging.basicConfig(format=u'%(filename)s [ LINE:%(lineno)+3s ]#%(levelname)+8s [%(asctime)s]  %(message)s',
                     level=logging.DEBUG)
-BASE_MEDIA_PATH = "C:\\Users\\Ilya\\PycharmProjects\\ChannelSender\\scripts\\demo-media\\pics\\photo.jpg"
 
+BASE_MEDIA_PATH = "./demo-media"
 
-# using print until demo
-
-def convert_to_binary_data(filename):
-    with open(filename, "rb") as file:
+'''
+def convert_to_binary_data(folder_path, filename):
+    with open(os.path.join(folder_path, filename), "rb") as file:
         binaryDATA = file.read()
     return binaryDATA
+'''
 
-
-def insertBLOB(picture):
-    print("Inserting BLOB file into picture_post table!")
+def insertBLOB(folder):
+    logging.info("Inserting BLOB file into picture_post table!")
     try:
-        connection = mysql.connector.connect(host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD)
+        connection = connect(host=DB_HOST, user=DB_USER, db=DB_NAME, password=DB_PASSWORD)
         cursor = connection.cursor()
-        sql_insert_blob_query = "INSERT INTO picture_post(picture) VALUES('%s0000000000000')"
-        post_picture = convert_to_binary_data(picture)
-        insert_blob_tuple = (post_picture)
+        folder_path = os.path.join(BASE_MEDIA_PATH, folder)
+        for filename in tqdm(os.listdir(folder_path)):
+            if filename.startswith('.'):
+                continue
 
-        result = cursor.execute("insert into picture_post(picture) values(%s)", (post_picture))
-        connection.commit()
-        print("Image inserted succesfully as a BLOB file", result)
+            print(f'Started processing {filename}')
+            with open(os.path.join(folder_path,filename),'rb') as file:
 
-    except mysql.connector.Error as error:
+                post_value = file.read()
+                cursor.execute("insert into picture_post(picture) values(%s)", (post_value))
+                connection.commit()
+                print("Image inserted succesfully as a BLOB file")
+
+    except Error as error:
         print(f"Failed inserting BLOB data into MySQL table {error}")
 
     finally:
-        if (connection.is_connected()):
+        if (cursor.connection):
             cursor.close()
             connection.close()
             print("MySQL connection is closed!")
 
 
-insertBLOB(BASE_MEDIA_PATH)
-#IS NOT WORK FIX LATER
+insertBLOB('files')
